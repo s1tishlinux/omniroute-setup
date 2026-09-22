@@ -1,6 +1,6 @@
 # 🚀 OmniRoute, Ollama & Multi-IDE AI Routing Setup Guide
 
-A complete, production-ready guide for installing, configuring, and wiring **OmniRoute**, **Ollama**, and developer IDEs (**VS Code**, **Continue.dev**, **GitHub Copilot**, **Cursor**, **Claude Code**, **Codex CLI**) using segregated free LLM tiers, local fast autocomplete, and fallback model chains on macOS.
+A complete, production-ready guide for installing, configuring, and wiring **OmniRoute**, **Ollama**, and developer IDEs (**VS Code**, **Continue.dev**, **GitHub Copilot**, **Cursor**, **Claude Code**, **Codex CLI**) using segregated free LLM tiers, local fast autocomplete, and multi-provider fallback chains on macOS.
 
 ---
 
@@ -10,7 +10,7 @@ A complete, production-ready guide for installing, configuring, and wiring **Omn
 3. [Step-by-Step Execution Guide](#-step-by-step-execution-guide)
    - [Step 1: Install & Verify Core Services](#step-1-install--verify-core-services)
    - [Step 2: Register Developer API Keys](#step-2-register-developer-api-keys)
-   - [Step 3: Create Segregated Routing Combos](#step-3-create-segregated-routing-combos)
+   - [Step 3: Create Multi-Provider Routing Combos](#step-3-create-multi-provider-routing-combos)
    - [Step 4: Wire Continue.dev Extension](#step-4-wire-continuedev-extension)
    - [Step 5: Wire GitHub Copilot Chat (Native VS Code Integration)](#step-5-wire-github-copilot-chat-native-vs-code-integration)
    - [Step 6: Create Ignore Filters (.continueignore & .cursorignore)](#step-6-create-ignore-filters-continueignore--cursorignore)
@@ -45,7 +45,7 @@ A complete, production-ready guide for installing, configuring, and wiring **Omn
                v                                         v
    +-----------------------+                 +-----------------------+
    |  Continue.dev / IDE   |                 | Upstream API Providers|
-   | (VS Code / Cursor)    |                 | (Gemini, Groq, GitHub)|
+   | (VS Code / Cursor)    |                 | (Gemini, NVIDIA, GH)  |
    +-----------------------+                 +-----------------------+
 ```
 
@@ -58,8 +58,9 @@ A complete, production-ready guide for installing, configuring, and wiring **Omn
 - **Node.js** `>= 20.0.0`
 - Developer API keys:
   - Google Gemini API Key
-  - Groq API Key
+  - NVIDIA NIM API Key
   - GitHub Personal Access Token (PAT) / GitHub Models
+  - OpenRouter API Key
 
 ---
 
@@ -98,11 +99,14 @@ Add your provider keys using the OmniRoute CLI:
 # Google Gemini API Key
 omniroute keys add gemini "YOUR_GEMINI_API_KEY"
 
-# Groq API Key
-omniroute keys add groq "YOUR_GROQ_API_KEY"
+# NVIDIA NIM API Key
+omniroute keys add nvidia "YOUR_NVIDIA_API_KEY"
 
 # GitHub Models PAT
 omniroute keys add github "YOUR_GITHUB_PAT"
+
+# OpenRouter API Key
+omniroute keys add openrouter "YOUR_OPENROUTER_API_KEY"
 ```
 
 To list registered keys:
@@ -112,23 +116,26 @@ omniroute keys list
 
 ---
 
-### Step 3: Create Segregated Routing Combos
+### Step 3: Create Multi-Provider Routing Combos
 
-Execute the following commands to create isolated, fallback-enabled model chains:
+Execute the following commands to create isolated, multi-provider fallback chains:
 
-1. **Pro Coding Combo** (Primary: Gemini 3.6 Flash → Fallback: Groq Llama 3.3 70B):
+1. **Pro Coding Combo** (Primary: Gemini 3.6 Flash → Antigravity 3.7 Flash → NVIDIA Llama 3.3 70B):
    ```bash
-   omniroute combo create combo-pro-coding --strategy priority --models "gemini/gemini-3.6-flash,groq/llama-3.3-70b-versatile"
+   omniroute combo create combo-pro-coding --strategy priority \
+     --models "gemini/gemini-3.6-flash,antigravity/gemini-3.7-flash,nvidia/llama-3.3-70b-instruct"
    ```
 
-2. **Deep Reasoning Combo** (Primary: DeepSeek-R1 via GitHub → Fallback: Gemini 3.6 Pro):
+2. **Deep Reasoning Combo** (Primary: DeepSeek-R1 via GitHub → Gemini 3.1 Pro → Antigravity 3.1 Pro):
    ```bash
-   omniroute combo create combo-deep-reasoning --strategy priority --models "github/deepseek-r1,gemini/gemini-3.6-pro"
+   omniroute combo create combo-deep-reasoning --strategy priority \
+     --models "github/deepseek-r1,gemini/gemini-3.1-pro-preview,antigravity/gemini-3.1-pro"
    ```
 
-3. **Fast Chat Combo** (Primary: Groq Llama 3.3 70B → Fallback: Codestral):
+3. **Fast Chat Combo** (Primary: Gemini 3.1 Flash Lite → NVIDIA Gemma 3 31B → OpenRouter Groq Llama 3.3 70B):
    ```bash
-   omniroute combo create combo-fast-chat --strategy priority --models "groq/llama-3.3-70b-versatile,mistral/codestral-2501"
+   omniroute combo create combo-fast-chat --strategy priority \
+     --models "gemini/gemini-3.1-flash-lite,nvidia/gemma-3-31b,openrouter/groq/llama-3.3-70b-versatile"
    ```
 
 Verify created combos:
@@ -144,19 +151,19 @@ Create or update `~/.continue/config.yaml`:
 
 ```yaml
 models:
-  - name: "Pro Coding (Gemini 3.6 Flash -> Groq)"
+  - name: "Pro Coding (Gemini 3.6 Flash -> Antigravity -> NVIDIA)"
     provider: "openai"
     model: "combo-pro-coding"
     apiBase: "http://localhost:20128/v1"
     apiKey: "sk-omniroute-local"
 
-  - name: "Deep Reasoning (DeepSeek-R1)"
+  - name: "Deep Reasoning (DeepSeek-R1 -> Gemini 3.1 Pro)"
     provider: "openai"
     model: "combo-deep-reasoning"
     apiBase: "http://localhost:20128/v1"
     apiKey: "sk-omniroute-local"
 
-  - name: "Fast Iteration (Groq 70B)"
+  - name: "Fast Iteration (Flash Lite -> Gemma 3 -> Llama 3.3)"
     provider: "openai"
     model: "combo-fast-chat"
     apiBase: "http://localhost:20128/v1"
@@ -213,7 +220,7 @@ pnpm-lock.yaml
    omniroute doctor
    ```
 
-2. **Simulate Combo Routing**:
+2. **Simulate Multi-Provider Routing**:
    ```bash
    omniroute simulate --combo combo-pro-coding "Write a quicksort function"
    ```
