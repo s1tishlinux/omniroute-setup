@@ -118,24 +118,42 @@ omniroute keys list
 
 ### Step 3: Create Multi-Provider Routing Combos
 
-Execute the following commands to create isolated, multi-provider fallback chains:
+Execute the following commands to create task-specific, multi-provider fallback chains:
 
-1. **Pro Coding Combo** (Primary: Gemini 3.6 Flash → Antigravity 3.7 Flash → NVIDIA Llama 3.3 70B):
+1. **Pro Coding Combo**:
    ```bash
    omniroute combo create combo-pro-coding --strategy priority \
      --models "gemini/gemini-3.6-flash,antigravity/gemini-3.7-flash,nvidia/llama-3.3-70b-instruct"
    ```
 
-2. **Deep Reasoning Combo** (Primary: DeepSeek-R1 via GitHub → Gemini 3.1 Pro → Antigravity 3.1 Pro):
+2. **Deep Reasoning Combo**:
    ```bash
    omniroute combo create combo-deep-reasoning --strategy priority \
      --models "github/deepseek-r1,gemini/gemini-3.1-pro-preview,antigravity/gemini-3.1-pro"
    ```
 
-3. **Fast Chat Combo** (Primary: Gemini 3.1 Flash Lite → NVIDIA Gemma 3 31B → OpenRouter Groq Llama 3.3 70B):
+3. **Fast Chat Combo**:
    ```bash
    omniroute combo create combo-fast-chat --strategy priority \
      --models "gemini/gemini-3.1-flash-lite,nvidia/gemma-3-31b,openrouter/groq/llama-3.3-70b-versatile"
+   ```
+
+4. **Vision Multimodal Combo**:
+   ```bash
+   omniroute combo create combo-vision-multimodal --strategy priority \
+     --models "gemini/gemini-3.7-flash,nvidia/llama-3.2-90b-vision-instruct"
+   ```
+
+5. **Ultra Heavy Refactoring Combo**:
+   ```bash
+   omniroute combo create combo-ultra-heavy --strategy priority \
+     --models "gemini/gemini-3.6-flash,gemini/gemini-3.1-pro-preview"
+   ```
+
+6. **Zero Cost Free Tiers Combo**:
+   ```bash
+   omniroute combo create combo-zero-cost --strategy priority \
+     --models "gemini/gemini-3.6-flash,github/deepseek-r1,nvidia/llama-3.3-70b-instruct"
    ```
 
 Verify created combos:
@@ -169,6 +187,24 @@ models:
     apiBase: "http://localhost:20128/v1"
     apiKey: "sk-omniroute-local"
 
+  - name: "Vision Multimodal (Gemini 3.7 Vision -> NVIDIA Vision)"
+    provider: "openai"
+    model: "combo-vision-multimodal"
+    apiBase: "http://localhost:20128/v1"
+    apiKey: "sk-omniroute-local"
+
+  - name: "Ultra Heavy Refactoring (Gemini 3.6 -> Gemini 3.1 Pro)"
+    provider: "openai"
+    model: "combo-ultra-heavy"
+    apiBase: "http://localhost:20128/v1"
+    apiKey: "sk-omniroute-local"
+
+  - name: "Zero Cost Free Tiers (Gemini -> GitHub -> NVIDIA)"
+    provider: "openai"
+    model: "combo-zero-cost"
+    apiBase: "http://localhost:20128/v1"
+    apiKey: "sk-omniroute-local"
+
   - name: "Spark MLX"
     provider: "openai"
     model: "XHToken/Spark-X2.5-1.7B"
@@ -190,8 +226,6 @@ Install the official **OmniCopilot** bridge extension:
 ```bash
 code --install-extension diegosouzapw.omnicopilot
 ```
-
-This populates your local OmniRoute combos directly in the native VS Code Copilot model dropdown menu without needing an active Copilot subscription.
 
 ---
 
@@ -243,17 +277,13 @@ pnpm-lock.yaml
 ### Native VS Code & GitHub Copilot
 1. Install extension: `code --install-extension diegosouzapw.omnicopilot`
 2. Open Copilot Chat panel (`Cmd + Shift + I`).
-3. Select `combo-pro-coding`, `combo-deep-reasoning`, or `combo-fast-chat` from the model picker dropdown.
+3. Select any combo (`combo-pro-coding`, `combo-deep-reasoning`, `combo-vision-multimodal`, etc.) from the model dropdown menu.
 
 ### Cursor IDE
 1. Go to **Cursor Settings** -> **Models**.
 2. Enable **Override OpenAI Base URL** and set it to: `http://localhost:20128/v1`.
 3. Set **API Key** to: `sk-omniroute-local`.
-4. Click **Add Model** and add:
-   - `combo-pro-coding`
-   - `combo-deep-reasoning`
-   - `combo-fast-chat`
-5. Disable `gpt-4o` and `claude-3.5-sonnet` to ensure traffic flows strictly through your OmniRoute combos.
+4. Click **Add Model** and add your combos (`combo-pro-coding`, `combo-deep-reasoning`, `combo-fast-chat`, `combo-vision-multimodal`, `combo-ultra-heavy`, `combo-zero-cost`).
 
 ### Terminal Agents (Claude Code & Codex CLI)
 Launch terminal agents pre-wired to OmniRoute combos:
