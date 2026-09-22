@@ -96,13 +96,13 @@ Add your provider keys using the OmniRoute CLI:
 
 ```bash
 # Google Gemini API Key
-omniroute keys add --provider google "YOUR_GEMINI_API_KEY"
+omniroute keys add gemini "YOUR_GEMINI_API_KEY"
 
 # Groq API Key
-omniroute keys add --provider groq "YOUR_GROQ_API_KEY"
+omniroute keys add groq "YOUR_GROQ_API_KEY"
 
 # GitHub Models PAT
-omniroute keys add --provider github "YOUR_GITHUB_PAT"
+omniroute keys add github "YOUR_GITHUB_PAT"
 ```
 
 To list registered keys:
@@ -116,14 +116,14 @@ omniroute keys list
 
 Execute the following commands to create isolated, fallback-enabled model chains:
 
-1. **Pro Coding Combo** (Primary: Gemini 2.5 Flash → Fallback: Groq Llama 3.3 70B):
+1. **Pro Coding Combo** (Primary: Gemini 3.6 Flash → Fallback: Groq Llama 3.3 70B):
    ```bash
-   omniroute combo create combo-pro-coding --strategy priority --models "google/gemini-2.5-flash,groq/llama-3.3-70b-versatile"
+   omniroute combo create combo-pro-coding --strategy priority --models "gemini/gemini-3.6-flash,groq/llama-3.3-70b-versatile"
    ```
 
-2. **Deep Reasoning Combo** (Primary: DeepSeek-R1 via GitHub → Fallback: Gemini 2.5 Pro):
+2. **Deep Reasoning Combo** (Primary: DeepSeek-R1 via GitHub → Fallback: Gemini 3.6 Pro):
    ```bash
-   omniroute combo create combo-deep-reasoning --strategy priority --models "github/deepseek-r1,google/gemini-2.5-pro"
+   omniroute combo create combo-deep-reasoning --strategy priority --models "github/deepseek-r1,gemini/gemini-3.6-pro"
    ```
 
 3. **Fast Chat Combo** (Primary: Groq Llama 3.3 70B → Fallback: Codestral):
@@ -144,7 +144,7 @@ Create or update `~/.continue/config.yaml`:
 
 ```yaml
 models:
-  - name: "Pro Coding (Gemini 2.5 Flash -> Groq)"
+  - name: "Pro Coding (Gemini 3.6 Flash -> Groq)"
     provider: "openai"
     model: "combo-pro-coding"
     apiBase: "http://localhost:20128/v1"
@@ -293,6 +293,6 @@ Access the Web Dashboard at: **[http://localhost:20128/home](http://localhost:20
 - **Error: `401 Unauthorized` / `Authentication required`**:
   Ensure your request includes `-H "Authorization: Bearer sk-omniroute-local"` or a key created in `/dashboard/api-keys`.
 - **Error: `402 Payment Required`**:
-  Occurs when an upstream provider key is unconfigured or out of quota. Add a direct provider key via `omniroute keys add --provider <provider> <key>`.
+  Occurs when an upstream provider key is unconfigured or out of quota. Add a direct provider key via `omniroute keys add <provider> <key>`.
 - **Ollama connection issue**:
   Verify Ollama is running on port 11434 (`curl http://localhost:11434`). Start via `brew services start ollama`.
