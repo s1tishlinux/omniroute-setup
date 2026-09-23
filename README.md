@@ -1,6 +1,6 @@
 # 🚀 OmniRoute, Ollama & Multi-IDE AI Routing Setup Guide
 
-A complete, production-ready guide for installing, configuring, and wiring **OmniRoute**, **Ollama**, and developer tools across **Desktop Apps** (Codex Desktop, Claude Desktop, Open WebUI, Jan, Chatbox), **IDE Extensions** (VS Code, GitHub Copilot, Continue.dev, Cursor, Cline, Roo Code, JetBrains, Zed), and **Terminal Coding Agents** (Codex CLI, Claude Code, Qwen Code, Orca, Aider) using 10 verified API provider tiers, local GPU autocomplete, and 6 multi-provider fallback chains on macOS.
+A complete, production-ready guide for installing, configuring, and wiring **OmniRoute**, **Ollama**, **Orca Spark MLX**, and developer tools across **Desktop Apps** (Codex Desktop, Claude Desktop, Open WebUI, Jan, Chatbox), **IDE Extensions** (VS Code, GitHub Copilot, Continue.dev, Cursor, Cline, Roo Code, JetBrains, Zed), and **Terminal Coding Agents** (Codex CLI, Claude Code, Qwen Code, Orca, Aider) using 10 verified API provider tiers, local GPU autocomplete, and 6 multi-provider fallback chains on macOS.
 
 ---
 
@@ -9,19 +9,21 @@ A complete, production-ready guide for installing, configuring, and wiring **Omn
 2. [Universal Compatibility Matrix (Desktop, IDEs, Extensions & CLIs)](#-universal-compatibility-matrix)
 3. [Prerequisites](#-prerequisites)
 4. [6 Multi-Provider Routing Combos Overview](#-6-multi-provider-routing-combos-overview)
-5. [Step-by-Step Execution Guide](#-step-by-step-execution-guide)
+5. [Orca & Spark-MLX Apple Silicon Setup](#-orca--spark-mlx-apple-silicon-setup)
+6. [Step-by-Step Execution Guide](#-step-by-step-execution-guide)
    - [Step 1: Install & Verify Core Services](#step-1-install--verify-core-services)
    - [Step 2: Register & Verify 10 Developer API Keys](#step-2-register--verify-10-developer-api-keys)
    - [Step 3: Create 6 Multi-Provider Routing Combos](#step-3-create-6-multi-provider-routing-combos)
-   - [Step 4: Configure Desktop Apps (Codex Desktop, Claude Desktop, Open WebUI)](#step-4-configure-desktop-apps)
-   - [Step 5: Wire IDE Extensions (VS Code, Continue.dev, Copilot, Cursor, Cline, JetBrains)](#step-5-wire-ide-extensions)
-   - [Step 6: Configure Terminal Coding Agents (Codex CLI, Claude Code, Qwen, Orca, Aider)](#step-6-configure-terminal-coding-agents)
-   - [Step 7: Create Ignore Filters (.continueignore & .cursorignore)](#step-7-create-ignore-filters)
-   - [Step 8: Verification & Overload Failover Testing](#step-8-verification--overload-failover-testing)
-6. [Live Execution & Doctor Diagnostic Outputs](#-live-execution--doctor-diagnostic-outputs)
-7. [OmniRoute Web Dashboard Overview](#-omniroute-web-dashboard-overview)
-8. [CLI Command Reference](#-cli-command-reference)
-9. [Troubleshooting & FAQs](#-troubleshooting--faqs)
+   - [Step 4: Configure Orca Spark MLX & Codex Profiles](#step-4-configure-orca-spark-mlx--codex-profiles)
+   - [Step 5: Configure Desktop Apps (Codex Desktop, Claude Desktop, Open WebUI)](#step-5-configure-desktop-apps)
+   - [Step 6: Wire IDE Extensions (VS Code, Continue.dev, Copilot, Cursor, Cline, JetBrains)](#step-6-wire-ide-extensions)
+   - [Step 7: Configure Terminal Coding Agents (Codex CLI, Claude Code, Qwen, Orca, Aider)](#step-7-configure-terminal-coding-agents)
+   - [Step 8: Create Ignore Filters (.continueignore & .cursorignore)](#step-8-create-ignore-filters)
+   - [Step 9: Verification & Overload Failover Testing](#step-9-verification--overload-failover-testing)
+7. [Live Execution & Doctor Diagnostic Outputs](#-live-execution--doctor-diagnostic-outputs)
+8. [OmniRoute Web Dashboard Overview](#-omniroute-web-dashboard-overview)
+9. [CLI Command Reference](#-cli-command-reference)
+10. [Troubleshooting & FAQs](#-troubleshooting--faqs)
 
 ---
 
@@ -78,13 +80,14 @@ Because OmniRoute standardizes all underlying cloud providers (Gemini, Groq, NVI
 | **Terminal CLIs** | **Codex CLI (`codex`)** | ✅ Fully Supported | `~/.codex/config.toml` + `omniroute setup-codex` |
 | | **Claude Code CLI** | ✅ Fully Supported | `omniroute setup-claude` |
 | | **Qwen Code CLI** | ✅ Fully Supported | `omniroute setup-qwen --model combo-pro-coding --yes` |
-| | **Aider / Orca / Goose** | ✅ Fully Supported | `export OPENAI_API_BASE="http://localhost:20128/v1"` |
+| | **Orca Spark CLI** | ✅ Fully Supported | `codex --profile orca-spark` |
+| | **Aider / Goose / Interpreter**| ✅ Fully Supported | `export OPENAI_API_BASE="http://localhost:20128/v1"` |
 
 ---
 
 ## 🛠️ Prerequisites
 
-- **macOS** (Apple Silicon or Intel)
+- **macOS** (Apple Silicon GPU or Intel)
 - **Homebrew** installed (`brew`)
 - **Node.js** `>= 20.0.0`
 - Developer API keys for providers:
@@ -111,6 +114,81 @@ Because OmniRoute standardizes all underlying cloud providers (Gemini, Groq, NVI
 | **`combo-vision-multimodal`** | UI Mockups, Diagrams & Screenshots | Gemini 3.7 Flash ➔ Gemini 3.6 Flash | ✅ 100% Active |
 | **`combo-ultra-heavy`** | Refactoring Huge Repos (2M Context) | Gemini 3.6 Flash ➔ Mistral Codestral ➔ Groq Llama 3.3 70B | ✅ 100% Active |
 | **`combo-zero-cost`** | 100% Free Tiers Only | Gemini 3.6 Flash ➔ Groq Llama 3.3 70B ➔ Mistral Codestral | ✅ 100% Active |
+
+---
+
+## 🐋 Orca & Spark-MLX Apple Silicon Setup
+
+The **Orca Workspace** (`/Users/satishgundu/orca`) runs a local Apple Silicon GPU hardware-accelerated model server (`spark-mlx-server`) serving `XHToken/Spark-X2.5-1.7B` on `http://127.0.0.1:8080/v1`.
+
+### 1. Direct MLX API Test
+```bash
+curl -s -X POST http://127.0.0.1:8080/v1/chat/completions \
+  -H "Content-Type: application/json" \
+  -d '{
+    "model": "XHToken/Spark-X2.5-1.7B",
+    "messages": [{"role": "user", "content": "Hello Spark MLX!"}]
+  }'
+```
+
+**Verified Output**:
+```json
+{
+  "id": "chatcmpl-63c09dca-cc3b-4b51-9250-42332f0f820f",
+  "system_fingerprint": "0.31.3-0.32.2-macOS-26.6.2-arm64-arm-64bit-Mach-O-applegpu_g15g",
+  "object": "chat.completion",
+  "model": "XHToken/Spark-X2.5-1.7B",
+  "created": 1790139500,
+  "choices": [
+    {
+      "index": 0,
+      "finish_reason": "stop",
+      "message": {
+        "role": "assistant",
+        "content": "Hello! I am Spark MLX, and I can provide you with various cognitive intelligence services including language understanding, question answering, reasoning, etc."
+      }
+    }
+  ],
+  "usage": {
+    "prompt_tokens": 21,
+    "completion_tokens": 55,
+    "total_tokens": 76
+  }
+}
+```
+
+### 2. Codex CLI Profile Setup for Orca Spark
+Profile created at `~/.codex/orca-spark.config.toml`:
+```toml
+model = "XHToken/Spark-X2.5-1.7B"
+model_provider = "omniroute"
+model_reasoning_effort = "max"
+model_context_window = 32768
+tool_output_token_limit = 16384
+skills_context_budget = 0.25
+
+openai_base_url = "http://localhost:20128/v1"
+api_key = "sk-omniroute-local"
+```
+
+### 3. Execution Command
+```bash
+cd /Users/satishgundu/orca
+codex --profile orca-spark exec --skip-git-repo-check "Return text 'Orca Spark integration verified!'"
+```
+
+**Verified Output**:
+```text
+--------
+workdir: /Users/satishgundu/orca
+model: XHToken/Spark-X2.5-1.7B
+provider: omniroute
+session id: 01a0cca5-299c-7863-a460-45b52322ab4f
+--------
+user: Return text 'Orca Spark integration verified!'
+codex: Orca Spark integration verified!
+tokens used: 6,075
+```
 
 ---
 
@@ -221,13 +299,40 @@ omniroute combo list
 
 ---
 
-### Step 4: Configure Desktop Apps
+### Step 4: Configure Orca Spark MLX & Codex Profiles
+
+1. **Verify Spark MLX local server**:
+   ```bash
+   curl -s http://127.0.0.1:8080/v1/models
+   ```
+
+2. **Create Codex Orca profile (`~/.codex/orca-spark.config.toml`)**:
+   ```toml
+   model = "XHToken/Spark-X2.5-1.7B"
+   model_provider = "omniroute"
+   model_reasoning_effort = "max"
+   model_context_window = 32768
+   tool_output_token_limit = 16384
+   skills_context_budget = 0.25
+
+   openai_base_url = "http://localhost:20128/v1"
+   api_key = "sk-omniroute-local"
+   ```
+
+3. **Launch Orca Spark interactive Codex CLI**:
+   ```bash
+   codex --profile orca-spark
+   ```
+
+---
+
+### Step 5: Configure Desktop Apps
 
 #### 1. Codex Desktop App
 1. Open **Codex Desktop** ➔ Settings ➔ Advanced / Custom Models.
 2. Enable **Custom OpenAI Base URL**: `http://localhost:20128/v1`
 3. Set **API Key**: `sk-omniroute-local`
-4. Enter Model Name: `combo-pro-coding` (or any combo name like `combo-deep-reasoning`).
+4. Enter Model Name: `combo-pro-coding` (or `XHToken/Spark-X2.5-1.7B`).
 
 #### 2. Claude Desktop App
 1. Open or edit `~/Library/Application Support/Claude/claude_desktop_config.json`.
@@ -248,7 +353,7 @@ omniroute combo list
 
 ---
 
-### Step 5: Wire IDE Extensions
+### Step 6: Wire IDE Extensions
 
 #### 1. Continue.dev Extension (VS Code / JetBrains)
 Update `~/.continue/config.yaml`:
@@ -324,7 +429,7 @@ This populates all 6 OmniRoute combos directly into the native VS Code Copilot m
 
 ---
 
-### Step 6: Configure Terminal Coding Agents
+### Step 7: Configure Terminal Coding Agents
 
 1. **OpenAI Codex CLI (`codex`)**:
    - Run setup to generate profiles:
@@ -374,7 +479,7 @@ This populates all 6 OmniRoute combos directly into the native VS Code Copilot m
 
 ---
 
-### Step 7: Create Ignore Filters (.continueignore & .cursorignore)
+### Step 8: Create Ignore Filters (.continueignore & .cursorignore)
 
 Create ignore files in `~/.continue/.continueignore` and `~/.cursorignore`:
 
@@ -392,7 +497,7 @@ pnpm-lock.yaml
 
 ---
 
-### Step 8: Verification & Overload Failover Testing
+### Step 9: Verification & Overload Failover Testing
 
 1. **Run OmniRoute Doctor**:
    ```bash
