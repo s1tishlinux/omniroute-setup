@@ -1,56 +1,84 @@
 # 🚀 OmniRoute, Ollama & Multi-IDE AI Routing Setup Guide
 
-A complete, production-ready guide for installing, configuring, and wiring **OmniRoute**, **Ollama**, and developer IDEs & CLI agents (**VS Code**, **Continue.dev**, **GitHub Copilot**, **Cursor**, **Claude Code**, **Codex CLI**, **Qwen Code**, **Orca**, **Aider**) using 10 verified API provider tiers, local GPU autocomplete, and 6 multi-provider fallback chains on macOS.
+A complete, production-ready guide for installing, configuring, and wiring **OmniRoute**, **Ollama**, and developer tools across **Desktop Apps** (Codex Desktop, Claude Desktop, Open WebUI, Jan, Chatbox), **IDE Extensions** (VS Code, GitHub Copilot, Continue.dev, Cursor, Cline, Roo Code, JetBrains, Zed), and **Terminal Coding Agents** (Codex CLI, Claude Code, Qwen Code, Orca, Aider) using 10 verified API provider tiers, local GPU autocomplete, and 6 multi-provider fallback chains on macOS.
 
 ---
 
 ## 📋 Table of Contents
-1. [Architecture & Topology](#-architecture--topology)
-2. [Prerequisites](#-prerequisites)
-3. [6 Multi-Provider Routing Combos Overview](#-6-multi-provider-routing-combos-overview)
-4. [Step-by-Step Execution Guide](#-step-by-step-execution-guide)
+1. [Architecture & Universal Compatibility](#-architecture--universal-compatibility)
+2. [Universal Compatibility Matrix (Desktop, IDEs, Extensions & CLIs)](#-universal-compatibility-matrix)
+3. [Prerequisites](#-prerequisites)
+4. [6 Multi-Provider Routing Combos Overview](#-6-multi-provider-routing-combos-overview)
+5. [Step-by-Step Execution Guide](#-step-by-step-execution-guide)
    - [Step 1: Install & Verify Core Services](#step-1-install--verify-core-services)
    - [Step 2: Register & Verify 10 Developer API Keys](#step-2-register--verify-10-developer-api-keys)
    - [Step 3: Create 6 Multi-Provider Routing Combos](#step-3-create-6-multi-provider-routing-combos)
-   - [Step 4: Wire Continue.dev Extension](#step-4-wire-continuedev-extension)
-   - [Step 5: Wire GitHub Copilot Chat (Native VS Code Integration)](#step-5-wire-github-copilot-chat-native-vs-code-integration)
-   - [Step 6: Configure Terminal Coding Agents (Codex, Claude, Qwen, Orca)](#step-6-configure-terminal-coding-agents-codex-claude-qwen-orca)
-   - [Step 7: Create Ignore Filters (.continueignore & .cursorignore)](#step-7-create-ignore-filters-continueignore--cursorignore)
+   - [Step 4: Configure Desktop Apps (Codex Desktop, Claude Desktop, Open WebUI)](#step-4-configure-desktop-apps)
+   - [Step 5: Wire IDE Extensions (VS Code, Continue.dev, Copilot, Cursor, Cline, JetBrains)](#step-5-wire-ide-extensions)
+   - [Step 6: Configure Terminal Coding Agents (Codex CLI, Claude Code, Qwen, Orca, Aider)](#step-6-configure-terminal-coding-agents)
+   - [Step 7: Create Ignore Filters (.continueignore & .cursorignore)](#step-7-create-ignore-filters)
    - [Step 8: Verification & Overload Failover Testing](#step-8-verification--overload-failover-testing)
-5. [Live Execution & Doctor Diagnostic Outputs](#-live-execution--doctor-diagnostic-outputs)
-   - [API Keys Status (`omniroute keys list`)](#api-keys-status-omniroute-keys-list)
-   - [Combos Status (`omniroute combo list`)](#combos-status-omniroute-combo-list)
-   - [Doctor Verification (`omniroute doctor`)](#doctor-verification-omniroute-doctor)
-   - [Live API Test Output (`curl` execution)](#live-api-test-output-curl-execution)
-6. [IDE & Tool Setup Reference](#-ide--tool-setup-reference)
+6. [Live Execution & Doctor Diagnostic Outputs](#-live-execution--doctor-diagnostic-outputs)
 7. [OmniRoute Web Dashboard Overview](#-omniroute-web-dashboard-overview)
 8. [CLI Command Reference](#-cli-command-reference)
 9. [Troubleshooting & FAQs](#-troubleshooting--faqs)
 
 ---
 
-## 🏗️ Architecture & Topology
+## 🏗️ Architecture & Universal Compatibility
+
+OmniRoute acts as a **Universal OpenAI-compatible and Anthropic-compatible API Gateway** running locally at `http://localhost:20128/v1` (OpenAI endpoint) and `http://localhost:20128` (Anthropic endpoint).
+
+Because OmniRoute standardizes all underlying cloud providers (Gemini, Groq, NVIDIA, Mistral, Cerebras, SambaNova, Cohere, GitHub Models) into standard REST endpoints, **it works seamlessly with ANY Desktop App, Web UI, IDE Extension, or CLI Tool that supports custom API Base URLs**.
 
 ```
-+-----------------------------------------------------------------------------------+
-|                                     Local Host                                    |
-|                                                                                   |
-|  +------------------------+  +-------------------+  +--------------------------+  |
-|  |   Ollama Local Server  |  | Spark MLX Server  |  |    OmniRoute Gateway     |  |
-|  | http://localhost:11434  |  | 127.0.0.1:8080    |  |  http://localhost:20128  |  |
-|  +-----------+------------+  +---------+---------+  +------------+-------------+  |
-|              |                         |                       |                  |
-|    Local Tab Autocomplete           Local Spark MLX      6 Multi-Provider Combos |
-|   (qwen2.5-coder:7b-base)        (Spark-X2.5-1.7B)     RTK Token Compression  |
-|              |                         |                       |                  |
-+--------------+-------------------------+-----------------------+------------------+
-               |                         |                       |
-               v                         v                       v
-   +-----------------------+ +-----------------------+ +----------------------------+
-   | Continue.dev / Cursor | | VS Code / Copilot Chat| | 10 Verified Cloud Providers|
-   | (VS Code / Cursor IDE)| | (OmniCopilot Extension)| | (Gemini, Groq, NVIDIA, GH)|
-   +-----------------------+ +-----------------------+ +----------------------------+
++---------------------------------------------------------------------------------------------------------+
+|                                                Local Host                                               |
+|                                                                                                         |
+|  +------------------------+  +-------------------+  +------------------------------------------------+  |
+|  |   Ollama Local Server  |  | Spark MLX Server  |  |                OmniRoute Gateway               |  |
+|  | http://localhost:11434  |  | 127.0.0.1:8080    |  |  http://localhost:20128 (OpenAI/Anthropic /v1) |  |
+|  +-----------+------------+  +---------+---------+  +-----------------------+------------------------+  |
+|              |                         |                                  |                             |
+|    Local Tab Autocomplete           Local Spark MLX                 6 Multi-Provider Combos             |
+|   (qwen2.5-coder:7b-base)        (Spark-X2.5-1.7B)               RTK Token Compression             |
+|              |                         |                                  |                             |
++--------------+-------------------------+----------------------------------+-----------------------------+
+               |                         |                                  |
+               +-------------------------+----------------------------------+
+                                         |
+     +-----------------------------------+-----------------------------------+
+     |                                   |                                   |
+     v                                   v                                   v
++--------------------------+ +--------------------------+ +--------------------------+
+|       DESKTOP APPS       | |      IDE EXTENSIONS      | |      TERMINAL AGENTS    |
+| • Codex Desktop App      | | • Continue.dev           | | • Codex CLI (`codex`)    |
+| • Claude Desktop App     | | • VS Code (Copilot Chat) | | • Claude Code CLI       |
+| • Open WebUI / Jan AI    | | • Cursor IDE             | | • Qwen Code CLI (`qwen`) |
+| • Chatbox / Obsidian     | | • Cline / Roo Code / Kilo| | • Aider / Orca / Goose   |
++--------------------------+ +--------------------------+ +--------------------------+
 ```
+
+---
+
+## 🌐 Universal Compatibility Matrix
+
+| Category | Application / Tool | Compatibility Status | Configuration Method |
+| :--- | :--- | :---: | :--- |
+| **Desktop Apps** | **Codex Desktop App** | ✅ Fully Supported | Settings ➔ Custom Provider ➔ Base URL: `http://localhost:20128/v1` |
+| | **Claude Desktop App** | ✅ Fully Supported | `claude_desktop_config.json` ➔ `ANTHROPIC_BASE_URL: http://localhost:20128` |
+| | **Jan AI / LM Studio** | ✅ Fully Supported | Settings ➔ Inference Provider ➔ Custom OpenAI endpoint: `http://localhost:20128/v1` |
+| | **Open WebUI** | ✅ Fully Supported | Connections ➔ Add OpenAI API: `http://localhost:20128/v1` |
+| | **Chatbox / MindMac** | ✅ Fully Supported | Settings ➔ Model Provider: Custom OpenAI ➔ `http://localhost:20128/v1` |
+| **IDE Extensions** | **Continue.dev (VS Code/JetBrains)** | ✅ Fully Supported | `~/.continue/config.yaml` ➔ `apiBase: http://localhost:20128/v1` |
+| | **VS Code GitHub Copilot** | ✅ Fully Supported | Install `OmniCopilot` extension (`diegosouzapw.omnicopilot`) |
+| | **Cursor IDE** | ✅ Fully Supported | Settings ➔ Models ➔ Override OpenAI Base URL: `http://localhost:20128/v1` |
+| | **Cline / Roo Code / Kilo** | ✅ Fully Supported | Provider: OpenAI Compatible ➔ Base URL: `http://localhost:20128/v1` |
+| | **Zed Editor** | ✅ Fully Supported | `settings.json` ➔ `language_models` ➔ `openai`: `http://localhost:20128/v1` |
+| **Terminal CLIs** | **Codex CLI (`codex`)** | ✅ Fully Supported | `~/.codex/config.toml` + `omniroute setup-codex` |
+| | **Claude Code CLI** | ✅ Fully Supported | `omniroute setup-claude` |
+| | **Qwen Code CLI** | ✅ Fully Supported | `omniroute setup-qwen --model combo-pro-coding --yes` |
+| | **Aider / Orca / Goose** | ✅ Fully Supported | `export OPENAI_API_BASE="http://localhost:20128/v1"` |
 
 ---
 
@@ -193,8 +221,36 @@ omniroute combo list
 
 ---
 
-### Step 4: Wire Continue.dev Extension
+### Step 4: Configure Desktop Apps
 
+#### 1. Codex Desktop App
+1. Open **Codex Desktop** ➔ Settings ➔ Advanced / Custom Models.
+2. Enable **Custom OpenAI Base URL**: `http://localhost:20128/v1`
+3. Set **API Key**: `sk-omniroute-local`
+4. Enter Model Name: `combo-pro-coding` (or any combo name like `combo-deep-reasoning`).
+
+#### 2. Claude Desktop App
+1. Open or edit `~/Library/Application Support/Claude/claude_desktop_config.json`.
+2. Add or update the Anthropic base URL environment variable:
+   ```json
+   {
+     "env": {
+       "ANTHROPIC_BASE_URL": "http://localhost:20128"
+     }
+   }
+   ```
+
+#### 3. Open WebUI / Jan AI / Chatbox Desktop
+1. Go to Settings ➔ Providers / Models ➔ OpenAI Compatible.
+2. API Host: `http://localhost:20128/v1`
+3. API Key: `sk-omniroute-local`
+4. Available models will automatically include `combo-pro-coding`, `combo-deep-reasoning`, `combo-fast-chat`, `combo-vision-multimodal`, `combo-ultra-heavy`, and `combo-zero-cost`.
+
+---
+
+### Step 5: Wire IDE Extensions
+
+#### 1. Continue.dev Extension (VS Code / JetBrains)
 Update `~/.continue/config.yaml`:
 
 ```yaml
@@ -247,21 +303,28 @@ tabAutocompleteModel:
   apiBase: "http://localhost:11434"
 ```
 
----
-
-### Step 5: Wire GitHub Copilot Chat (Native VS Code Integration)
-
+#### 2. VS Code GitHub Copilot Chat (Native Integration)
 Install the official **OmniCopilot** bridge extension:
-
 ```bash
 code --install-extension diegosouzapw.omnicopilot
 ```
+This populates all 6 OmniRoute combos directly into the native VS Code Copilot model dropdown menu.
 
-This populates all 6 OmniRoute combos directly into the native VS Code Copilot model dropdown menu without requiring a paid Copilot subscription.
+#### 3. Cursor IDE
+1. Open **Cursor Settings** ➔ **Models**.
+2. Enable **Override OpenAI Base URL**: `http://localhost:20128/v1`.
+3. Set **API Key**: `sk-omniroute-local`.
+4. Add model names: `combo-pro-coding`, `combo-deep-reasoning`, `combo-fast-chat`, `combo-vision-multimodal`, `combo-ultra-heavy`, `combo-zero-cost`.
+
+#### 4. Cline / Roo Code / Kilo Code Extensions
+1. In the extension panel, select API Provider: **OpenAI Compatible**.
+2. Set Base URL: `http://localhost:20128/v1`
+3. Set API Key: `sk-omniroute-local`
+4. Enter Model ID: `combo-pro-coding`
 
 ---
 
-### Step 6: Configure Terminal Coding Agents (Codex, Claude, Qwen, Orca)
+### Step 6: Configure Terminal Coding Agents
 
 1. **OpenAI Codex CLI (`codex`)**:
    - Run setup to generate profiles:
@@ -456,21 +519,6 @@ curl -s -X POST http://localhost:20128/v1/chat/completions \
 
 ---
 
-## 🖥️ IDE & Tool Setup Reference
-
-### Native VS Code & GitHub Copilot
-1. Install extension: `code --install-extension diegosouzapw.omnicopilot`
-2. Open Copilot Chat (`Cmd + Shift + I`).
-3. Select any combo (`combo-pro-coding`, `combo-deep-reasoning`, `combo-vision-multimodal`) from the dropdown.
-
-### Cursor IDE
-1. Go to **Cursor Settings** -> **Models**.
-2. Enable **Override OpenAI Base URL**: `http://localhost:20128/v1`.
-3. Set **API Key**: `sk-omniroute-local`.
-4. Add model names: `combo-pro-coding`, `combo-deep-reasoning`, `combo-fast-chat`, `combo-vision-multimodal`, `combo-ultra-heavy`, `combo-zero-cost`.
-
----
-
 ## 🌐 OmniRoute Web Dashboard Overview
 
 Access the Web Dashboard at: **[http://localhost:20128/home](http://localhost:20128/home)**
@@ -500,9 +548,11 @@ Access the Web Dashboard at: **[http://localhost:20128/home](http://localhost:20
 
 ## 🔧 Troubleshooting & FAQs
 
+- **Does OmniRoute work with Desktop Apps (Codex Desktop, Claude Desktop, Jan)?**
+  **YES!** OmniRoute exposes standard OpenAI (`http://localhost:20128/v1`) and Anthropic (`http://localhost:20128`) endpoints. Simply set the custom API endpoint/base URL in your desktop application to point to OmniRoute.
+- **Does OmniRoute work with all VS Code / JetBrains / Cursor extensions?**
+  **YES!** Any extension that supports OpenAI-compatible endpoints (Continue.dev, OmniCopilot, Cursor, Cline, Roo Code, Kilo Code, JetBrains AI Assistant) works natively.
 - **Model API Overloaded Error**:
   OmniRoute's Priority fallback strategy automatically catches 429/503/404 overload errors and reroutes your prompt to the next provider (e.g. Google -> Mistral -> NVIDIA -> Groq) within milliseconds.
 - **`401 Unauthorized`**:
   Ensure your request includes `-H "Authorization: Bearer sk-omniroute-local"`.
-- **Codex CLI Metadata Warning**:
-  The `Model metadata for combo-pro-coding not found` notice in Codex CLI is purely informational when using custom OpenAI-compatible proxies. It defaults safely to a 2M token context window.
